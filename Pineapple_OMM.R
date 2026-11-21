@@ -65,19 +65,6 @@ MLB_Performance <- MLB_Model_History |>
   mutate(Sport = "MLB") |>
   rename(bet_type = full_bet_type)
 
-
-
-ggplot(MLB_Performance, aes(x = game_date, y = Cumulative_AUC,
-                            color = full_bet_type)) +
-  geom_line()
-
-ggplot(MLB_Performance, aes(x = game_date, y = Cumulative_Brier,
-                            color = full_bet_type)) +
-  geom_hline(yintercept = 0.25, linetype = "dashed", alpha = 0.5) +
-  geom_line() 
-
-
-
 NBA_Model_History <- DBI::dbGetQuery(
   con,
   "SELECT * FROM nba_game_pick_history"
@@ -136,19 +123,6 @@ NBA_Spread_Performance <- NBA_Spread_History |>
   pivot_longer(cols = c(RMSE, MAE, MAPE),
                values_to = "Value", names_to = "Measure") |>
   mutate(Sport = "NBA", bet_type = "Spread")
-
-
-
-ggplot(MLB_Performance, aes(x = game_date, y = Cumulative_AUC,
-                            color = full_bet_type)) +
-  geom_line()
-
-ggplot(MLB_Performance, aes(x = game_date, y = Cumulative_Brier,
-                            color = full_bet_type)) +
-  geom_hline(yintercept = 0.25, linetype = "dashed", alpha = 0.5) +
-  geom_line() 
-
-
 
 NFL_Model_History <- DBI::dbGetQuery(
   con,
@@ -278,3 +252,10 @@ Tot_Model_Performance <- bind_rows(MLB_Performance,
                                    NFL_ML_Performance,
                                    NCAAF_ML_Performance) |>
   arrange(Sport, game_date)
+
+DBI::dbWriteTable(
+  con,
+  "OMM",
+  Tot_Model_Performance,
+  overwrite = TRUE
+)
